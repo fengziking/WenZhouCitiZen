@@ -1,0 +1,82 @@
+//
+//  MineController.m
+//  WenZhouCitiZen
+//
+//  Created by 刘建明 on 2018/3/1.
+//  Copyright © 2018年 刘建明. All rights reserved.
+//
+
+#import "MineController.h"
+#import "MineTableView.h"
+#import "MineTableCell.h"
+@interface MineController ()
+
+@property (nonatomic,strong)MineTableView *tableView ;
+
+@end
+
+@implementation MineController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    self.view.backgroundColor = KColorWhite ;
+    self.navigationItem.title = @"我的";
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"设置" style:UIBarButtonItemStylePlain target:self action:@selector(setClick)];
+    
+    [self.view addSubview:self.tableView];
+    
+    [self loadMineData];
+
+}
+-(void)setClick{
+//    _tableView.setBool = NO;
+//    [_tableView reloadData];
+    [kCJBasicDataManager logOutSuccessBlock:^{
+        self.tabBarController.selectedIndex = 0;
+
+    } fail:^{
+
+    }];
+}
+- (void)loadMineData {
+    NSArray *dataArr = @[@{@"imageName":@"MineKq",@"title":@"卡券"},
+                         @{@"imageName":@"zhand",@"title":@"账单"},
+                         @{@"imageName":@"guanli",@"title":@"卡片管理"},
+                         @{@"imageName":@"huodong",@"title":@"我的活动"},
+                         @{@"imageName":@"cjwet",@"title":@"常见问题"},
+                         @{@"imageName":@"icon",@"title":@"问题反馈"},
+                         @{@"imageName":@"gongs",@"title":@"关于我们"},
+                         @{@"imageName":@"fenx",@"title":@"推荐给好友"},
+                         ];
+    [self.tableView.dataArray addObjectsFromArray:[MineModel mj_objectArrayWithKeyValuesArray:dataArr]];
+    [self.tableView reloadData];
+}
+-(MineTableView *)tableView  {
+    if (!_tableView) {
+        
+        _tableView = [[MineTableView alloc]initWithFrame:CGRectMake(0, CJ_StatusBarAndNavigationBarHeight, KScreenWidth, KScreenHeight-CJ_StatusBarAndNavigationBarHeight) style:UITableViewStylePlain];
+        _tableView.setBool = YES;
+        WS(weakSelf);
+        _tableView.actionHandler = ^(NSInteger index) {
+           
+        };
+    }
+    return _tableView ;
+    
+}
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+@end

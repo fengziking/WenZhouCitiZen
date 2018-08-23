@@ -1,0 +1,20 @@
+//
+//  MyCell.h
+//  UICollectionView_Base
+//
+//  Created by 夏婷 on 15/12/2.
+//  Copyright (c) 2015年 夏婷. All rights reserved.
+//
+
+#import <UIKit/UIKit.h>
+
+@interface MenuItem : UICollectionViewCell
+
+
+
+///设置显示文字
+@property(nonatomic, strong) UILabel *titleLbl;
+///设置显示图片的名字
+@property (nonatomic, strong) UIImageView *ImageView;
+
+@end

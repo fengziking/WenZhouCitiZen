@@ -1,0 +1,64 @@
+//
+//  MyCell.m
+//  UICollectionView_Base
+//
+//  Created by 夏婷 on 15/12/2.
+//  Copyright (c) 2015年 夏婷. All rights reserved.
+//
+
+#import "MenuItem.h"
+
+@implementation MenuItem
+
+-(instancetype)initWithFrame:(CGRect)frame
+{
+    self = [super initWithFrame:frame];
+    if (self) {
+        //添加子视图
+        [self createSubViews];
+        
+    }
+    return self;
+}
+
+-(void)createSubViews
+{
+    [self.contentView addSubview:self.ImageView];
+    self.ImageView.image = [UIImage imageNamed:@"jiaoyimingxi"];
+    [self.contentView addSubview:self.titleLbl];
+    self.titleLbl.text = @"是我咋说";
+}
+-(UIImageView *)ImageView{
+    if (!_ImageView) {
+        _ImageView = [[UIImageView alloc]init];
+    }
+    return _ImageView;
+}
+-(UILabel *)titleLbl{
+    if (!_titleLbl) {
+        _titleLbl = [[UILabel alloc]inittextFont:12 textColor:[UIColor blackColor] textAlignment:1];
+        
+    }
+    return _titleLbl;
+    
+}
+
+-(void)drawRect:(CGRect)rect {
+    [super drawRect:rect];
+    __weak typeof(self) weakSelf = self;
+    [self.ImageView  mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.size.mas_equalTo(CGSizeMake(weakSelf.width * 0.35 , weakSelf.height *0.35 ));
+        make.top.equalTo(weakSelf).with.offset(10);
+        make.centerX.equalTo(weakSelf);
+        
+    }];
+    [self.titleLbl  mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.size.mas_equalTo(CGSizeMake(weakSelf.width, 15 ));
+        make.top.equalTo(weakSelf.ImageView.mas_bottom).with.offset(10);
+        make.left.equalTo(weakSelf.mas_left).with.offset(0);
+        
+    }];
+    
+    
+}
+@end

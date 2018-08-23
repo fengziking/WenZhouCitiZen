@@ -1,0 +1,297 @@
+//
+//  CJLogTextFiled.m
+//  XJCardPro
+//
+//  Created by 创建zzh on 2017/4/28.
+//  Copyright © 2017年 cjzzh. All rights reserved.
+//
+
+#import "CJLogTextFiled.h"
+
+#define NUM @"0123456789"
+#define ALPHA @"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+#define ALPHANUM @"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+
+
+@interface CJLogTextFiled ()<UITextFieldDelegate>
+
+@property (nonatomic, strong)UIImageView *leftIcon;
+
+@property (nonatomic, strong)UILabel *placeholderLabel;
+
+@property (nonatomic, strong)UIView *contentView;
+
+@property (nonatomic, copy)NSString *limitStr;
+
+@end
+
+
+@implementation CJLogTextFiled
+
+- (void)dealloc {
+    [self remoeNoti];
+}
+- (instancetype)initWithFrame:(CGRect)frame beginEdit:(CJTfdBlock)beginEdit didChanged:(CJTfdBlock)didChanged endEdit:(CJTfdBlock)endEdit toMaxEdit:(CJTfdBlock)toMax{
+    self = [super initWithFrame:frame];
+    if (self) {
+
+        self.textBeginEdit = beginEdit;
+        self.textDidChangedEdit = didChanged;
+        self.textEndEdit = endEdit;
+        self.textToMaxEdit = toMax;
+        
+        [self creatView];
+        [self addNoti];
+        self.backgroundColor = MyRGBColor(248, 248, 248);
+
+        self.layer.shadowColor = [UIColor grayColor].CGColor;
+        self.layer.shadowOffset = CGSizeMake(0,2);
+        self.layer.shadowOpacity = .2;
+        self.layer.shadowRadius = 2;
+    }
+    return self;
+}
+- (void)addNoti {
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(beginEditing) name:UITextFieldTextDidBeginEditingNotification object:_tfd];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didChanged) name:UITextFieldTextDidChangeNotification object:_tfd];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(endEditing) name:UITextFieldTextDidEndEditingNotification object:_tfd];
+}
+- (void)remoeNoti {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+- (void)creatView {
+    
+    _contentView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.width, self.height)];
+    _contentView.backgroundColor = KColorWhite;
+    [self addSubview:_contentView];
+
+    [_contentView addSubview:self.leftIcon];
+    [_contentView addSubview:self.tfd];
+    [_contentView addSubview:self.placeholderLabel];
+
+    _contentView.layer.cornerRadius = 5;
+    _contentView.layer.masksToBounds = YES;
+    _contentView.clipsToBounds = YES;
+
+}
+- (NSString *)text {
+    return self.tfd.text;
+}
+#pragma mark -- set
+- (void)setPlaceholder:(NSString *)placeholder {
+    _placeholderLabel.text = placeholder;
+}
+
+- (void)setImgName:(NSString *)imgName {
+    _imgName = imgName;
+    if (self.leftIcon) {
+        self.leftIcon.image = [UIImage imageNamed:_imgName];
+    }
+}
+- (void)setType:(kCJLogTfd)type {
+    _type = type;
+    if (_type == kTfdTypeNumber) {
+        self.tfd.keyboardType = UIKeyboardTypeNumberPad;
+        self.limitStr = NUM;
+    } else if (_type == kTfdTypeChinese) {
+        self.limitStr = nil;
+    } else if (_type == kTfdTypeABCNumber) {
+        self.limitStr = ALPHANUM;
+    } else if (_type == kTfdCantInput) {
+        self.tfd.hidden = YES;
+        self.placeholderLabel.hidden = NO;
+        self.placeholderLabel.width += 50;
+        UIImageView *arrowImg = [[UIImageView alloc] initWithFrame:CGRectMake(self.width-kMargin-9, (self.height-15)/2, 9, 15)];
+        arrowImg.image = [UIImage imageNamed:@"xj_cell_arrow"];
+        arrowImg.userInteractionEnabled = YES;
+        [self addSubview:arrowImg];
+        
+    
+        [self.placeholderLabel cj_addTapGestureWithBlock:^(UIGestureRecognizer *gestureRecoginzer) {
+            
+            KNSLog(@"点击带有arrow图标的textFiled");
+            
+            self.placeholderLabel.userInteractionEnabled = NO;
+
+            if (self.textToMaxEdit) {
+                self.textToMaxEdit(self.tfd);
+            }
+            
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                self.placeholderLabel.userInteractionEnabled = YES;
+            });
+            
+        }];
+    }
+}
+
+
+- (void)configCountDownNormalTitle:(NSString *)normalTitle
+                    changeingTitle:(NSString *)changeTitle
+                     finishedTitle:(NSString *)finishTitle
+                     countDownTime:(NSUInteger)time{
+    if (!_countDownBtn) {
+        
+        _tfd.width = self.width-_leftIcon.width-90;
+        
+        _countDownBtn = [CJCountDownButton buttonWithType:UIButtonTypeCustom];
+        _countDownBtn.frame = CGRectMake(_contentView.width-90, 0, 90, self.height);
+        [_countDownBtn setTitle:normalTitle forState:UIControlStateNormal];
+        _countDownBtn.backgroundColor =  KColorMainBlue;
+        _countDownBtn.titleLabel.font = kFontSize15;
+        [_countDownBtn setTitleColor:KColorWhite forState:UIControlStateNormal];
+        _countDownBtn.layer.mask = [CJTool getCornersWithRect:_countDownBtn.bounds withUIRectCorner0:UIRectCornerBottomRight withUIRectCorner1:UIRectCornerTopRight withRadius:5];
+        [_contentView addSubview:_countDownBtn];
+        
+       
+        @weakify(self);
+        [_countDownBtn countDownButtonHandler:^(CJCountDownButton*sender, NSInteger tag) {
+            
+            sender.enabled = NO;
+            
+            [sender startCountDownWithSecond:time];
+            
+            @strongify(self);
+            if (self.beginCountDwon) {
+                self.beginCountDwon(self.countDownBtn);
+            }
+            
+            [sender countDownChanging:^NSString *(CJCountDownButton *countDownButton,NSUInteger second) {
+                
+                NSString *title = [NSString stringWithFormat:@"%@%zd秒",changeTitle,second];
+                return title;
+            }];
+            [sender countDownFinished:^NSString *(CJCountDownButton *countDownButton, NSUInteger second) {
+                countDownButton.enabled = YES;
+                
+                if (self.endingCountDown) {
+                    self.endingCountDown(self.countDownBtn);
+                }
+                
+                return finishTitle;
+                
+            }];
+        }];
+        
+    }
+}
+#pragma mark -- Action
+- (void)beginEditing {
+
+    if (self.textBeginEdit) {
+        self.textBeginEdit(self.tfd);
+    }
+    self.placeholderLabel.hidden = YES;
+    self.tfd.hidden = NO;
+}
+- (void)didChanged {
+    
+//    [[_tfd.textInputMode primaryLanguage] isEqualToString:@"emoji"];
+//    [[_tfd.textInputMode primaryLanguage] isEqualToString:@"enjoy"];
+    
+    if (_maxLength!=NSUIntegerMax && _maxLength!=0)
+    {
+        NSString *beString = self.tfd.text;
+        UITextRange *selectedRange = [self.tfd markedTextRange];
+        UITextPosition *position = [self.tfd positionFromPosition:selectedRange.start offset:0];
+        
+        if(!position)
+        {
+            if(beString.length>_maxLength)
+            {
+                self.tfd.text = [beString substringToIndex:_maxLength];
+                
+                if(self.textToMaxEdit)
+                {
+                    self.textToMaxEdit(self.tfd);//到达最大长度回调
+                }
+            }
+        }
+    }
+
+    //传递
+    if (self.textDidChangedEdit) {
+        self.textDidChangedEdit(self.tfd);
+    }
+}
+
+- (void)endEditing {
+    //显示
+    if (self.tfd.text.length == 0) {
+        self.placeholderLabel.hidden = NO;
+        self.tfd.hidden = YES;
+    }
+    //传递
+    if (self.textEndEdit) {
+        self.textEndEdit(self.tfd);
+    }
+}
+
+- (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
+{
+    
+    if (!self.limitStr) {
+        //没有限制
+        return YES;
+    }
+    
+    NSCharacterSet *cs = [[NSCharacterSet characterSetWithCharactersInString:ALPHANUM] invertedSet];
+    NSString *filtered = [[string componentsSeparatedByCharactersInSet:cs] componentsJoinedByString:@""];
+    return  [string isEqualToString:filtered];
+}
+
+- (void)showTfdText:(NSString *)text {
+    if (text.length == 0) return;
+    if (_type == kTfdCantInput) {
+        self.placeholderLabel.text = text;
+        self.placeholderLabel.textColor = self.tfd.textColor;
+        self.tfd.text = text;
+        self.tfd.hidden = YES;
+    } else {
+        self.placeholderLabel.hidden = YES;
+        self.tfd.text = text;
+    }
+}
+#pragma mark -- LazyLoad
+- (UITextField *)tfd {
+    if (!_tfd) {
+        _tfd = [[UITextField alloc] initWithFrame:CGRectMake(_leftIcon.right, 0, self.width-_leftIcon.width-10, self.height)];
+        _tfd.textColor = KColorBlack;
+        _tfd.font = kFontSize15;
+        _tfd.delegate = self;
+        _tfd.backgroundColor = KColorWhite;
+        _tfd.keyboardType = UIKeyboardTypeDefault;
+    }
+    return _tfd;
+}
+
+- (UIImageView *)leftIcon {
+    if (!_leftIcon) {
+        _leftIcon = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 30, self.height)];
+        _leftIcon.contentMode = UIViewContentModeCenter;
+        _leftIcon.userInteractionEnabled = YES;
+        _leftIcon.backgroundColor = KColorWhite;
+        @weakify(self);
+        [_leftIcon cj_addTapGestureWithBlock:^(UIGestureRecognizer *gestureRecoginzer) {
+            @strongify(self);
+            [self.tfd becomeFirstResponder];
+        }];
+    }
+    return _leftIcon;
+}
+
+- (UILabel *)placeholderLabel {
+    if (!_placeholderLabel) {
+        _placeholderLabel = [[UILabel alloc] initWithFrame:CGRectMake(_tfd.left, _tfd.top, _tfd.width, _tfd.height)];
+        _placeholderLabel.textColor = MyRGBColor(135, 135, 135);
+        _placeholderLabel.font = kFontSize15;
+        _placeholderLabel.backgroundColor = KColorWhite;
+        @weakify(self);
+        [_placeholderLabel cj_addTapGestureWithBlock:^(UIGestureRecognizer *gestureRecoginzer) {
+            @strongify(self);
+            [self.tfd becomeFirstResponder];
+        }];
+    }
+    return _placeholderLabel;
+}
+@end

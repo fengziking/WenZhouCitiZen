@@ -1,0 +1,125 @@
+//
+//  CJRootViewController.m
+//  WenLingCitizenCard
+//
+//  Created by 创建zzh on 2017/3/8.
+//  Copyright © 2017年 zhusf. All rights reserved.
+//
+
+#import "CJRootViewController.h"
+#import "CJNavigationViewController.h"
+#import "CJTabBarView.h"
+
+#import "HomeController.h"
+#import "WebsController.h"
+#import "CenterController.h"
+#import "MineController.h"
+
+#import "LoginController.h"
+
+#define kClassKey   @"rootVCClassString"
+#define kTitleKey   @"title"
+
+
+@interface CJRootViewController ()<CJTabBarDelegate>
+
+@property (nonatomic,strong)UIViewController *subVC;
+@property (nonatomic,strong)CJTabBarView *cjTabBarView;
+
+@end
+
+@implementation CJRootViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    
+    [self addChildsVc];
+    [self creatTabBar];
+}
+
+#pragma mark -- 添加控制器
+- (void)addChildsVc {
+    
+    HomeController *homeCtrl = [[HomeController alloc] init];
+    CJNavigationViewController *navi0 = [[CJNavigationViewController alloc] initWithRootViewController:homeCtrl];
+    
+    WebsController *WebsCtrl = [[WebsController alloc] init];
+    WebsCtrl.urlStr = @"https://www.baidu.com";
+    CJNavigationViewController *navi1 = [[CJNavigationViewController alloc] initWithRootViewController:WebsCtrl];
+    
+    CenterController *serviCtrl = [[CenterController alloc] init];
+    CJNavigationViewController *navi2 = [[CJNavigationViewController alloc] initWithRootViewController:serviCtrl];
+    
+    MineController *mineCtrl = [[MineController alloc] init];
+    CJNavigationViewController *navi3 = [[CJNavigationViewController alloc] initWithRootViewController:mineCtrl];
+    
+    self.viewControllers = @[navi0,navi1,navi2,navi3];
+    
+}
+#pragma mark -- 创建标签栏
+- (void)creatTabBar {
+    // 去掉黑线
+//    [self.tabBar setShadowImage:[[UIImage alloc] init]];
+//    [self.tabBar setBackgroundImage:[UIImage imageWithColor:kColorWhite]];
+//    [self.tabBar setBarStyle:UIBarStyleDefault];
+
+    // 1.加载tabBar的View
+    self.cjTabBarView = [[CJTabBarView alloc] initWithFrame:self.tabBar.bounds];
+    self.cjTabBarView.tabBarDelegate = self;
+    self.cjTabBarView.backgroundColor = KColorWhite;
+    [self.tabBar insertSubview:self.cjTabBarView atIndex:self.tabBar.subviews.count];
+
+}
+#pragma mark -- CJTabBarDelegate
+- (void)CJTabBarViewClick:(CJTabBarView *)tabBarView didClickTabBarIndex:(NSInteger)selectIndex {
+    NSInteger tabbarIndex = selectIndex;
+    if (tabbarIndex == 3) {
+        
+        if (WZ_IsLoinState) {
+            self.selectedIndex = tabbarIndex;
+        } else {
+            LoginController *login = [[LoginController alloc] init];
+            login.completionBack = ^() {
+                self.selectedIndex = 0;
+            };
+            CJNavigationViewController *loginNav = [[CJNavigationViewController alloc] initWithRootViewController:login];
+            [self presentViewController:loginNav animated:YES completion:nil];
+        }
+    } else {
+
+        self.selectedIndex = tabbarIndex;
+    }
+}
+
+#pragma mark -- tabBarViewController 切换控制器
+- (void)setSelectedIndex:(NSUInteger)selectedIndex
+{
+    [self setSelectedTabRootState:selectedIndex];
+    [super setSelectedIndex:selectedIndex];
+    self.cjTabBarView.selectIndex = selectedIndex;
+}
+
+//防止标签栏出现在次级页面 点击标签可移除次级页面（做代码隐患的防范解决 基本上不会执行判断里面的代码）
+- (void)setSelectedTabRootState:(NSUInteger)selectedIndex
+{
+    UINavigationController *navVC = self.viewControllers[selectedIndex];
+    if (navVC.presentedViewController) {
+        if ([navVC.topViewController presentedViewController]) {
+            [navVC.topViewController dismissViewControllerAnimated:NO completion:nil];
+        }
+    }
+    if ([navVC.viewControllers count] > 1) {
+        if (super.selectedIndex == selectedIndex) {
+            [navVC popToRootViewControllerAnimated:YES];
+        } else {
+            [navVC popToRootViewControllerAnimated:NO];
+        }
+    }
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    
+}
+
+@end

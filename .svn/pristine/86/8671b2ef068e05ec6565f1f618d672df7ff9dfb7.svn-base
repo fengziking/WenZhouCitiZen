@@ -1,0 +1,158 @@
+//
+//  CenterController.m
+//  WenZhouCitiZen
+//
+//  Created by 刘建明 on 2018/3/1.
+//  Copyright © 2018年 刘建明. All rights reserved.
+//
+
+#import "CenterController.h"
+#import "LrdSuperMenu.h"
+
+@interface CenterController ()<LrdSuperMenuDataSource, LrdSuperMenuDelegate>
+
+@property (nonatomic, strong) LrdSuperMenu *menu;
+
+@property (nonatomic, strong) NSArray *sort;
+
+@property (nonatomic, strong) NSArray *classify;
+@property (nonatomic, strong) NSArray *jiachang;
+@property (nonatomic, strong) NSArray *difang;
+@property (nonatomic, strong) NSArray *tese;
+@property (nonatomic, strong) NSArray *rihan;
+@property (nonatomic, strong) NSArray *xishi;
+@property (nonatomic, strong) NSArray *shaokao;
+
+@end
+
+@implementation CenterController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    self.title = @"中间页";
+    // 数据
+    self.classify = @[@"全部", @"新店特惠", @"连锁餐厅", @"家常快餐", @"地方菜", @"特色小吃", @"日韩料理", @"西式快餐", @"烧烤海鲜"];
+    self.sort = @[@"排序", @"智能排序", @"销量最高", @"距离最近", @"评分最高", @"起送价最低", @"送餐速度最快"];
+    
+    self.jiachang = @[@"家常炒菜", @"黄焖J8饭", @"麻辣烫", @"盖饭"];
+    self.difang = @[@"湘菜", @"湘菜", @"湘菜", @"湘菜", @"湘菜", @"湘菜"];
+    self.tese = @[@"湘菜", @"湘菜", @"湘菜", @"湘菜", @"湘菜", @"湘菜", @"湘菜"];
+    self.rihan = @[@"湘菜", @"湘菜", @"湘菜", @"湘菜", @"湘菜", @"湘菜", @"湘菜"];
+    self.xishi = @[@"湘菜", @"湘菜", @"湘菜", @"湘菜", @"湘菜", @"湘菜", @"湘菜"];
+    self.shaokao = @[@"湘菜", @"湘菜", @"湘菜", @"湘菜", @"湘菜", @"湘菜", @"湘菜", @"湘菜"];
+    
+    
+    _menu = [[LrdSuperMenu alloc] initWithOrigin:CGPointMake(0, 88) andHeight:44];
+    _menu.delegate = self;
+    _menu.dataSource = self;
+    [self.view addSubview:_menu];
+    
+    [_menu selectDeafultIndexPath];
+}
+//有多少个column，默认为1列
+- (NSInteger)numberOfColumnsInMenu:(LrdSuperMenu *)menu {
+    return 2;
+}
+//每个column有多少行
+- (NSInteger)menu:(LrdSuperMenu *)menu numberOfRowsInColumn:(NSInteger)column {
+    if (column == 0) {
+        return self.classify.count;
+    }else {
+        return self.sort.count;
+    }
+}
+//每个column中每行的title
+- (NSString *)menu:(LrdSuperMenu *)menu titleForRowAtIndexPath:(LrdIndexPath *)indexPath {
+    if (indexPath.column == 0) {
+        return self.classify[indexPath.row];
+    }else  {
+        return self.sort[indexPath.row];
+    }
+}
+//第column列，每行的image
+- (NSString *)menu:(LrdSuperMenu *)menu imageNameForRowAtIndexPath:(LrdIndexPath *)indexPath {
+    if (indexPath.column == 0 || indexPath.column == 1) {
+        return @"baidu";
+    }
+    return nil;
+}
+//二级菜单的image
+- (NSString *)menu:(LrdSuperMenu *)menu imageForItemsInRowAtIndexPath:(LrdIndexPath *)indexPath {
+    if (indexPath.column == 0 && indexPath.item >= 0) {
+        return @"baidu";
+    }
+    return nil;
+}
+//detail text
+- (NSString *)menu:(LrdSuperMenu *)menu detailTextForRowAtIndexPath:(LrdIndexPath *)indexPath {
+    if (indexPath.column < 2) {
+        return [@(arc4random()%1000) stringValue];
+    }
+    return nil;
+}
+//二级菜单的detail text
+- (NSString *)menu:(LrdSuperMenu *)menu detailTextForItemsInRowAtIndexPath:(LrdIndexPath *)indexPath {
+    return [@(arc4random()%1000) stringValue];
+}
+//某列的某行item的数量，如果有，则说明有二级菜单，反之亦然
+- (NSInteger)menu:(LrdSuperMenu *)menu numberOfItemsInRow:(NSInteger)row inColumn:(NSInteger)column {
+    if (column == 0) {
+        if (row == 0) {
+            return self.jiachang.count;
+        }else if (row == 1) {
+            return self.difang.count;
+        }else if (row == 2) {
+            return self.tese.count;
+        }else if (row == 3) {
+            return self.rihan.count;
+        }else if (row == 4) {
+            return self.xishi.count;
+        }else if (row == 5) {
+            return self.shaokao.count;
+        }
+    }
+    return 0;
+}
+//二级菜单的标题
+- (NSString *)menu:(LrdSuperMenu *)menu titleForItemsInRowAtIndexPath:(LrdIndexPath *)indexPath {
+    NSInteger row = indexPath.row;
+    if (indexPath.column == 0) {
+        if (row == 0) {
+            return self.jiachang[indexPath.item];
+        }else if (row == 1) {
+            return self.tese[indexPath.item];
+        }else if (row == 2) {
+            return self.rihan[indexPath.item];
+        }else if (row == 3) {
+            return self.xishi[indexPath.item];
+        }else if (row == 4) {
+            return self.shaokao[indexPath.item];
+        }
+    }
+    return nil;
+}
+
+- (void)menu:(LrdSuperMenu *)menu didSelectRowAtIndexPath:(LrdIndexPath *)indexPath {
+    if (indexPath.item >= 0) {
+        NSLog(@"点击了 %ld - %ld - %ld 项目",indexPath.column,indexPath.row,indexPath.item);
+    }else {
+        NSLog(@"点击了 %ld - %ld 项目",indexPath.column,indexPath.row);
+    }
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+@end

@@ -1,0 +1,62 @@
+//
+//  Header.h
+//  WenZhouCitiZen
+//
+//  Created by 刘建明 on 2018/3/1.
+//  Copyright © 2018年 刘建明. All rights reserved.
+//
+
+#ifndef Header_h
+#define Header_h
+
+//显示网络错误的信息（在控制器中 隐藏时间2秒）
+#define kMBShowInNet(title) [MBProgressHUD bwm_showTitle:title toView:self.view hideAfter:2]
+//显示弹窗
+#define kMBShow(title,self,time) [MBProgressHUD bwm_showTitle:view toView:self hideAfter:time]
+//显示错误信息 (在控制器中)
+#define kMBShowInVC(title,time)  [MBProgressHUD bwm_showTitle:title toView:self.view hideAfter:time]
+//显示请求失败之后的error
+#define kMBShowErrorNetInVC  kMBShowInNet(kErrorStateMsg)
+//隐藏HUD (在控制器中)
+#define kMBHiddenInVC  [MBProgressHUD hideHUDForView:self.view animated:YES]
+
+//屏幕宽高
+#define KScreenWidth [UIScreen mainScreen].bounds.size.width
+#define KScreenHeight [UIScreen mainScreen].bounds.size.height
+#define KScreenBounds [UIScreen mainScreen].bounds
+//导航控制器
+#define Self_Nav self.viewController.navigationController
+//判断设备型号
+#define UI_IS_IPAD              ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)
+#define UI_IS_IPHONE            ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
+#define UI_IS_IPHONE4           (UI_IS_IPHONE && KScreenHeight < 568.0)
+#define UI_IS_IPHONE5SE         (UI_IS_IPHONE && KScreenHeight == 568.0)
+#define UI_IS_IPHONE67          (UI_IS_IPHONE && KScreenHeight == 667.0)
+#define UI_IS_IPHONE67PLUS      (UI_IS_IPHONE && KScreenHeight == 736.0)
+///屏幕比例
+#define H_Bili KScreenWidth/568
+#define W_Bili KScreenWidth/320
+
+#define UI_IS_IOS8_AND_HIGHER   (kSystermVersion >= 8.0)
+
+
+//系统版本号
+#define kSystermVersion [[[UIDevice currentDevice] systemVersion] floatValue]
+
+/**app 版本号*/
+#define KAPPVersionString [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"]
+
+/**系统版本号字符串*/
+#define kSystermVersionString [[UIDevice currentDevice] systemVersion]
+
+/**设备UDID*/
+#define KUUID [FCUUID uuidForDevice]
+
+/**输入字符*/
+#define KALPHANUM @"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+
+#define KJUSTNUMBER @"0123456789"
+//间隔10
+static CGFloat const kMargin = 10.f;
+
+#endif /* Header_h */

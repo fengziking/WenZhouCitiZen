@@ -1,0 +1,45 @@
+//
+//  AppDelegate+category.m
+//  WenZhouCitiZen
+//
+//  Created by 刘建明 on 2018/3/1.
+//  Copyright © 2018年 刘建明. All rights reserved.
+//
+
+#import "AppDelegate+category.h"
+
+@implementation AppDelegate (category)
+
+- (void)setupLibConfigWithOptions:(NSDictionary *)launchOptions {
+    
+    //设置键盘遮挡三方
+    [self configIQKeyboardManager];
+    //检查网络
+    [self configCheckNet];
+
+    
+}
+//设置键盘遮挡三方
+- (void)configIQKeyboardManager {
+    IQKeyboardManager *manager = [IQKeyboardManager sharedManager];
+    manager.enable = YES;
+    manager.shouldResignOnTouchOutside = YES;
+    manager.shouldToolbarUsesTextFieldTintColor = YES;
+    manager.enableAutoToolbar = YES;
+    
+}
+  //检查网络
+- (void)configCheckNet {
+    [PPNetworkHelper networkStatusWithBlock:^(PPNetworkStatus status) {
+        switch (status) {
+            case PPNetworkStatusUnknown:
+            case PPNetworkStatusNotReachable:
+                [MBProgressHUD bwm_showTitle:@"请检查网络设置" toView:[UIApplication sharedApplication].keyWindow hideAfter:1];
+                KNSLog(@"是否有网:%@",@(kIsWiFiNetwork));
+                break;
+            default:
+                break;
+        }
+    }];
+}
+@end

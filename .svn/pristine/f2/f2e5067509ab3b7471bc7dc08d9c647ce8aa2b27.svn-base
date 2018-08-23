@@ -1,0 +1,60 @@
+//
+//  HomeController.m
+//  WenZhouCitiZen
+//
+//  Created by 刘建明 on 2018/3/1.
+//  Copyright © 2018年 刘建明. All rights reserved.
+//
+
+#import "HomeController.h"
+#import "FunctionMenuController.h"
+
+
+@interface HomeController ()
+
+@end
+
+@implementation HomeController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    self.title = @"首页";
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"全部" style:UIBarButtonItemStylePlain target:self action:@selector(setClick)];
+    NSString *rsa =  [HttpTool jsonStringWithStr:@"18711111111"];
+    NSLog(@"rsa====%@",rsa);
+  //  NSString *rsa1 =  [HttpTool jsonStringWithStr:@"1"];
+
+    //NSLog(@"rsa===%@",rsa);
+
+   // NSString *rsa1 =  [HttpTool strWithJsonString3DES:@"E29921696FF6B5D96F0222E53E76DC4D"];
+   // NSLog(@"rsa===%@",rsa1);
+
+    CreateParamsDic;
+    DicObjectSet(rsa, @"login_name");
+//  [CJNetWorkManager CJPOSTCode:@"C/C001" parameters:ParamsDic success:^(id responseObject) {
+//    
+//    } failure:^(NSError *error) {
+//    }];
+    
+  
+}
+-(void)setClick{
+    FunctionMenuController *vc = [[FunctionMenuController alloc]init];
+    [self.navigationController pushViewController:vc animated:YES];
+}
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+@end

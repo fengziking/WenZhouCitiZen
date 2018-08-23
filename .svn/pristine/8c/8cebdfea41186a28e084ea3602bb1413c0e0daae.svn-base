@@ -1,0 +1,86 @@
+//
+//  BaseCollectionView.m
+//  LM_MoreFunction
+//
+//  Created by 刘建明 on 2018/3/6.
+//  Copyright © 2018年 余浩. All rights reserved.
+//
+
+#import "BaseCollectionView.h"
+#import "MenuItem.h"
+#import "HeaderView.h"
+
+@implementation BaseCollectionView
+
+-(instancetype)initWithFrame:(CGRect)frame collectionViewLayout:(UICollectionViewLayout *)layout{
+    if (self = [super initWithFrame:frame collectionViewLayout:layout]) {
+    }
+    return self;
+}
+
+-(void)setItemType:(ItemType)itemType{
+    _itemType = itemType;
+    [self creatViews];
+
+   
+}
+-(void)creatViews{
+    
+    self.dataSource = self;
+    self.delegate = self;
+    self.showsVerticalScrollIndicator = NO;
+    self.backgroundColor = [UIColor whiteColor];
+    self.scrollEnabled = NO;
+    [self registerClass:[MenuItem class] forCellWithReuseIdentifier:@"myCell"];
+    //注册的头视图
+    [self registerClass:[HeaderView class] forSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:@"header"];
+
+}
+#pragma mark UICollectionView
+- (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView {
+    return 1;
+}
+
+- (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
+    return 10;
+}
+#pragma mark - 组的头视图和尾视图相关的协议方法
+-(UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath
+{
+    if([kind isEqualToString:UICollectionElementKindSectionHeader])
+    {//头视图
+        HeaderView *scrollView = [collectionView dequeueReusableSupplementaryViewOfKind:kind withReuseIdentifier:@"header" forIndexPath:indexPath];
+        scrollView.backgroundColor = [UIColor whiteColor];
+        scrollView.titleLabel.text = @"头部标题";
+        return scrollView;
+    }
+    return nil;
+    
+}
+//刷新或创建网格（item、cell）的方法
+-(UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
+{
+    static NSString * itemID = @"myCell";
+    //collectionView到相应的复用池中查找是否有空闲的网格视图，如果有就直接使用，没有会直接创建新的返回
+    MenuItem *item = [collectionView dequeueReusableCellWithReuseIdentifier:itemID forIndexPath:indexPath];
+    if (_itemType == normalType) {
+        item.backgroundColor = KColorWhite;
+        
+    }else if (_itemType == editorType){
+        item.backgroundColor = KColorMainGray;
+        
+    }
+    return item;
+}
+//返回留出的边界
+-(UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout insetForSectionAtIndex:(NSInteger)section
+{
+    //上、左、下、右
+    return UIEdgeInsetsMake(10, 0, 10, 0);
+}
+- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{
+    //点击事件
+    NSLog(@"点击item%ld",(long)indexPath.row);
+    
+}
+@end

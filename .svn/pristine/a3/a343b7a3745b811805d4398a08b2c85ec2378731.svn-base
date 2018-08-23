@@ -1,0 +1,131 @@
+//
+//  DES3.m
+//  MySDKTest
+//
+//  Created by zhusf on 16/7/7.
+//  Copyright © 2016年 zhusf. All rights reserved.
+//
+
+#import "DES3.h"
+#import "GTMBase64.h"
+#define DES_IV @"01234567"
+@implementation DES3
+//DES_IV 自己定义的一个字符串 八个字节 一定要是八个字节
++(Byte *) getIv{
+    
+    NSString *testString = DES_IV;
+    NSData *testData = [testString dataUsingEncoding: NSUTF8StringEncoding];
+    //    for(int i=0;i<[testData length];i++)
+    //        printf("testByte = %d\n",testByte[i]);
+    return (Byte *)[testData bytes];
+}
+//plainText需加密 字符串 key 定义好的 加密 解密 钥匙
++(NSString *) encryptUseDES:(NSString *)plainText key:(NSString*)key{
+    
+    Byte *iv=[self getIv];
+    
+    //    NSString *escape=[plainText stringByReplacingOccurrencesOfString:@"\"" withString:@"\\\""];
+    //    return escape;
+  //  NSLog(@"----------%@",plainText);
+    NSData* data=[plainText dataUsingEncoding: NSUTF8StringEncoding];
+
+    NSUInteger bufferSize=([data length] + kCCKeySize3DES) & ~(kCCKeySize3DES -1);
+    
+    char buffer[bufferSize];
+    
+    memset(buffer, 0,sizeof(buffer));
+    
+    size_t bufferNumBytes;
+    
+    CCCryptorStatus cryptStatus = CCCrypt(kCCEncrypt,
+                                          
+                                          //kCCAlgorithmDES,
+                                          kCCAlgorithm3DES,
+                                          ccNoPadding|kCCOptionECBMode,
+                                          [key UTF8String],
+                                          //(__bridge const void *)(key),
+                                          kCCKeySize3DES,
+                                    
+                                          iv   ,
+                                          
+                                          [data bytes],
+                                          
+                                          [data length],
+                                          
+                                          buffer,
+                                          
+                                          bufferSize,
+                                          
+                                          &bufferNumBytes);
+    
+    if (cryptStatus ==kCCSuccess) {
+        
+        NSData *data = [NSData dataWithBytes:buffer length:(NSUInteger)bufferNumBytes];
+        NSString *base64String = [data base64EncodedStringWithOptions:0];
+//        NSLog(@"加密base64String===%@",base64String);
+        return base64String;
+      //  return [ConverUtil parseByteArray2HexString:[data bytes] count:bufferNumBytes] ;
+        //        NSLog(@"objccipherTextBytes:%@",[XYDES dataToHex:data]);
+         //      ciphertext = [GTMBase64 stringByEncodingData:data];
+        //        NSLog(@"objccipherTextBase64:%@",ciphertext);
+//        return [GTMBase64 stringByEncodingData:data];
+    }
+    
+    return nil;
+}
+
++(NSString*) decryptUseDES:(NSString*)cipherText key:(NSString*)key{
+    
+    Byte *iv=[self getIv];
+    
+    NSData* data = [ConverUtil parseHexToByteArray:cipherText];
+    NSUInteger bufferSize=([data length] + kCCKeySize3DES) & ~(kCCKeySize3DES -1);
+    
+    char buffer[bufferSize];
+    
+    memset(buffer, 0,sizeof(buffer));
+    
+    size_t bufferNumBytes;
+    
+    CCCryptorStatus cryptStatus = CCCrypt(kCCDecrypt,
+                                          
+                                          kCCAlgorithm3DES,
+                                          
+                                          ccNoPadding|kCCOptionECBMode,
+                                          
+                                          [key UTF8String],
+                                          
+                                          kCCKeySize3DES,
+                                          
+                                          iv,
+                                          
+                                          [data bytes],
+                                          
+                                          [data length],
+                                          
+                                          buffer,
+                                          
+                                          bufferSize,
+                                          
+                                          &bufferNumBytes);
+    
+    NSString* plainText = nil;
+//    NSDictionary* json;
+    if (cryptStatus ==kCCSuccess) {
+        
+        NSData *plainData =[NSData dataWithBytes:buffer length:(NSUInteger)bufferNumBytes];
+        NSString *base64String = [plainData base64EncodedStringWithOptions:0];
+        plainText = [[NSString alloc] initWithData:plainData encoding:NSUTF8StringEncoding];
+        //将nsstring转换成NSDictionary;
+       // NSError *error;
+//        json = [NSJSONSerialization
+//                              JSONObjectWithData:plainData
+ //                             options:kNilOptions
+ //                             error:&error];
+    }
+    
+    return plainText;
+   // return json;
+}
+
+@end

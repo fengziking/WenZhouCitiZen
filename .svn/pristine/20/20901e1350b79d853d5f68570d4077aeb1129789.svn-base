@@ -1,0 +1,65 @@
+//
+//  CJNavigationViewController.m
+//  WenLingCitizenCard
+//
+//  Created by 创建zzh on 2017/3/8.
+//  Copyright © 2017年 zhusf. All rights reserved.
+//
+
+#import "CJNavigationViewController.h"
+@interface CJNavigationViewController ()
+
+@end
+
+@implementation CJNavigationViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    
+}
+
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+
+}
+
+#pragma mark -- 返回
+- (void)pushViewController:(UIViewController *)viewController animated:(BOOL)animated {
+    
+    if (self.viewControllers.count > 0) {
+        viewController.hidesBottomBarWhenPushed = YES;
+        UIView *leftView = [[UIView alloc] initWithFrame:CGRectMake(20, 0, 60, 44)];
+        UIButton *btn = [UIButton buttonWithType:UIButtonTypeCustom];
+        btn.frame = CGRectMake(0, 0, 60, 44);
+        btn.imageEdgeInsets = UIEdgeInsetsMake(0, -40, 0, 0);
+        btn.titleLabel.font = [UIFont systemFontOfSize:15];
+        [btn setImage:[UIImage imageNamed:@"fh"] forState:UIControlStateNormal];
+        [btn addTarget:self action:@selector(clickBack) forControlEvents:UIControlEventTouchUpInside];
+        [leftView addSubview:btn];
+        viewController.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:leftView];;
+    }
+    
+    [super pushViewController:viewController animated:YES];
+}
+
+- (void)clickBack {
+ 
+        if (self.visibleViewController.presentedViewController) {
+            [self dismissViewControllerAnimated:YES completion:nil];
+        } else {
+            UIViewController *currentVC = self.visibleViewController;
+            if ([currentVC isKindOfClass:[CJBaseViewController class]]) {
+                CJBaseViewController *vc = (CJBaseViewController *)currentVC;
+                if (vc.mainReqCode) {
+                   // [CJNetWorkManager CJCancelRequestTaskWithReqCode:vc.mainReqCode];
+                }
+            }
+            [self popViewControllerAnimated:YES];
+        }
+
+    
+}
+
+
+@end

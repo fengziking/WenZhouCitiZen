@@ -1,0 +1,29 @@
+//
+//  MineTableCell.h
+//  JinHuaCitizen
+//
+//  Created by Frank-Lee on 17/8/3.
+//  Copyright © 2017年 Frank-Lee. All rights reserved.
+//
+
+#import <UIKit/UIKit.h>
+
+@interface MineModel : NSObject
+
+@property (nonatomic,copy)NSString *imageName ;
+@property (nonatomic,copy)NSString *title ;
+@property (nonatomic,assign)BOOL *setBool ;
+
+@end
+
+/********************************/
+
+@interface MineTableCell : UITableViewCell
+
+@property (nonatomic,strong)MineModel *model ;
+
++(CGFloat)getRowHeight ;
+
+@property (nonatomic, assign)BOOL setBool;
+
+@end

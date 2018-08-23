@@ -1,0 +1,19 @@
+//
+//  Common_Network.h
+//  JinHuaCitizen
+//
+//  Created by Frank-Lee on 17/8/3.
+//  Copyright © 2017年 Frank-Lee. All rights reserved.
+//
+
+#ifndef Common_Network_h
+#define Common_Network_h
+/****** NSMutableDictionary，用于设置网络请求参数 *******/
+#define CreateParamsDic NSMutableDictionary *ParamsDic = @{}.mutableCopy
+#define DicObjectSet(obj,key) {if (obj) {[ParamsDic setObject:obj forKey:key];}}
+#define DicValueSet(value,key) {if (value) {[ParamsDic setObject:value forKey:key];}}
+
+#define KBaseUrl @"http://60.12.161.2:4580/interf/front/"
+
+
+#endif /* Common_Network_h */

@@ -1,0 +1,15 @@
+//
+//  Common_Network.h
+//  JinHuaCitizen
+//
+//  Created by Frank-Lee on 17/8/3.
+//  Copyright © 2017年 Frank-Lee. All rights reserved.
+//
+
+#ifndef Common_Network_h
+#define Common_Network_h
+
+#define KBaseUrl @"http://60.12.161.2:4580/interf/front/"
+
+
+#endif /* Common_Network_h */
